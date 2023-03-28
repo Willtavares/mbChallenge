@@ -1,5 +1,5 @@
 <script setup>
-  import {reactive, ref} from 'vue';
+  import {reactive, ref, watch} from 'vue';
   import {useRouter} from 'vue-router';
   import {managerStore} from '../stores/ManagerStore.js';
 
@@ -18,25 +18,20 @@
 
   const router = useRouter();
 
-  const stage1 = [formData.email, formData.picked];
-
   let stage = ref(1);
-  let error = ref(false);
-
-  const data = ref([]);
+  let disabled = ref(true);
 
   const manager = managerStore();
 
+  watch(() => {
+    console.log(formData.picked);
+    if (formData.picked != null) {
+      disabled.value = false;
+    }
+  });
+
+  //Methods
   const stagePlus = () => {
-    // error.value = false;
-    // console.log(88, stage1.includes(null));
-    // if (stage1.includes(null)) {
-    //   console.log(11, error.value);
-    //   error.value = true;
-    //   console.log(12, error.value);
-    // } else {
-    //   stage.value++;
-    // }
     stage.value++;
   };
 
@@ -45,11 +40,7 @@
   };
 
   const onSubmit = (formData) => {
-    console.log(54, formData);
-    // if (e && e.preventDefault) {
-    // }
     manager.sendApiData(formData);
-
     sendList();
   };
 
@@ -60,7 +51,7 @@
 
 <template>
   <div class="container">
-    <form @submit.prevent="onSubmit(formData)">
+    <form @submit="onSubmit(formData)">
       <div v-if="stage === 1">
         <p>Etapa <span>1</span> de 4</p>
         <h2>Seja Bem Vindo(a)</h2>
@@ -71,7 +62,6 @@
           type="email"
           v-model="formData.email"
         />
-        <span v-if="error === true">E-mail é requerido</span>
 
         <div>
           <input
@@ -93,7 +83,9 @@
           <span v-if="error === true">Marque uma opção</span>
         </div>
         <div class="btn_box">
-          <button class="btn_plus" @click="stagePlus()">Continuar</button>
+          <button :disabled="disabled" class="btn_plus" @click="stagePlus()">
+            Continuar
+          </button>
         </div>
       </div>
 
