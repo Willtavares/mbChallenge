@@ -12,7 +12,7 @@ For more informations check out the [script setup docs](https://docs.nestjs.com/
 Após a clonagem, vá até as pastas fronted e backend e instalem as bibliotecas com o comando _npm install_
 
 Com as bibliotecas instaladas, na pasta frontend execute o comando _"npm run dev"_
-No backend execute o seguinte comando _"npm run stard:dev"_
+No backend execute o seguinte comando _"npm run start:dev"_
 
 ## Considerações
 
