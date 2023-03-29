@@ -5,7 +5,6 @@
 
   const manager = managerStore();
   const listin = storeToRefs(manager);
-
   const router = useRouter();
 
   const getApiData = () => {
@@ -16,6 +15,9 @@
 
   const back = () => {
     router.push('/');
+    setTimeout(() => {
+      location.reload();
+    }, 10);
   };
 </script>
 

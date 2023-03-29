@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import Multiform from './../components/MultiForm.vue';
+import Multiform from '../components/MultiForm.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

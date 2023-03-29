@@ -1,5 +1,6 @@
 <script setup>
-  import {reactive, ref, watch} from 'vue';
+  import {storeToRefs} from 'pinia';
+  import {reactive, ref} from 'vue';
   import {useRouter} from 'vue-router';
   import {managerStore} from '../stores/ManagerStore.js';
 
@@ -18,41 +19,31 @@
 
   const router = useRouter();
 
-  let stage = ref(1);
-  let disabled = ref(true);
+  let disabled = ref(false);
 
   const manager = managerStore();
-
-  watch(() => {
-    console.log(formData.picked);
-    if (formData.picked != null) {
-      disabled.value = false;
-    }
-  });
+  const informations = storeToRefs(manager);
 
   //Methods
-  const stagePlus = () => {
-    stage.value++;
-  };
+  function validator(level, formData, e) {
+    e.preventDefault();
+    manager.validationField(level, formData);
+  }
 
   const stageMinus = () => {
-    stage.value--;
+    manager.statusManager(-1);
   };
 
   const onSubmit = (formData) => {
     manager.sendApiData(formData);
-    sendList();
-  };
-
-  const sendList = () => {
     router.push('/list');
   };
 </script>
 
 <template>
   <div class="container">
-    <form @submit="onSubmit(formData)">
-      <div v-if="stage === 1">
+    <form @submit.prevent="onSubmit(formData)">
+      <div v-if="informations.status.value === 1">
         <p>Etapa <span>1</span> de 4</p>
         <h2>Seja Bem Vindo(a)</h2>
         <label class="label" for="email"> Endereço de e-mail </label>
@@ -62,6 +53,9 @@
           type="email"
           v-model="formData.email"
         />
+        <span for="email" v-if="informations.validArray.value.includes('email')"
+          >Preenchimento Obrigatório</span
+        >
 
         <div>
           <input
@@ -79,11 +73,19 @@
             value="PJ"
             v-model="formData.picked"
           />
-          <label for="two">Pessoa Juridica</label>
-          <span v-if="error === true">Marque uma opção</span>
+          <label for="two">Pessoa Juridica</label><br />
+          <span
+            for="email"
+            v-if="informations.validArray.value.includes('picked')"
+            >Preenchimento Obrigatório</span
+          >
         </div>
         <div class="btn_box">
-          <button :disabled="disabled" class="btn_plus" @click="stagePlus()">
+          <button
+            :disabled="disabled"
+            class="btn_plus"
+            @click="validator(1, formData, $event)"
+          >
             Continuar
           </button>
         </div>
@@ -91,7 +93,7 @@
 
       <div>
         <p>{{ formData.picked }}</p>
-        <div v-if="formData.picked === 'PF' && stage === 2">
+        <div v-if="informations.status.value === 2 && formData.picked === 'PF'">
           <p>Etapa <span>2</span> de 4</p>
           <h2>Pessoa Fisica</h2>
           <label class="label" for="name"> Nome: </label>
@@ -102,6 +104,9 @@
             type="text"
             v-model="formData.name"
           />
+          <span v-if="informations.validArray.value.includes('name')"
+            >Preenchimento Obrigatório</span
+          >
 
           <label class="label" for="cpf"> CPF: </label>
           <input
@@ -111,6 +116,9 @@
             type="text"
             v-model="formData.cpf"
           />
+          <span v-if="informations.validArray.value.includes('cpf')"
+            >Preenchimento Obrigatório</span
+          >
 
           <label class="label" for="dob"> Data de Nascimento: </label>
           <input
@@ -120,6 +128,9 @@
             type="date"
             v-model="formData.dob"
           />
+          <span v-if="informations.validArray.value.includes('dob')"
+            >Preenchimento Obrigatório</span
+          >
 
           <label class="label" for="tel"> Telefone: </label>
           <input
@@ -129,13 +140,19 @@
             type="tel"
             v-model="formData.tel"
           />
+          <span v-if="informations.validArray.value.includes('tel')"
+            >Preenchimento Obrigatório</span
+          >
+
           <div class="btn_box">
             <button class="btn_minus" @click="stageMinus()">Voltar</button>
-            <button class="btn_plus" @click="stagePlus()">Continuar</button>
+            <button class="btn_plus" @click="validator(2, formData, $event)">
+              Continuar
+            </button>
           </div>
         </div>
 
-        <div v-if="formData.picked === 'PJ' && stage === 2">
+        <div v-if="formData.picked === 'PJ' && informations.status.value === 2">
           <p>Etapa <span>2</span> de 4</p>
           <h2>Pessoa Juridica</h2>
           <label class="label" for="rs"> Razão Social: </label>
@@ -146,6 +163,9 @@
             type="text"
             v-model="formData.rs"
           />
+          <span v-if="informations.validArray.value.includes('rs')"
+            >Preenchimento Obrigatório</span
+          >
 
           <label class="label" for="cnpj"> CNPJ: </label>
           <input name="cnpj" id="cnpj" type="text" v-model="formData.cnpj" />
@@ -158,6 +178,9 @@
             type="date"
             v-model="formData.dobi"
           />
+          <span v-if="informations.validArray.value.includes('dobi')"
+            >Preenchimento Obrigatório</span
+          >
 
           <label class="label" for="tel"> Telefone: </label>
           <input
@@ -167,14 +190,20 @@
             type="tel"
             v-model="formData.tel"
           />
+          <span v-if="informations.validArray.value.includes('tel')"
+            >Preenchimento Obrigatório</span
+          >
+
           <div class="btn_box">
             <button class="btn_minus" @click="stageMinus()">Voltar</button>
-            <button class="btn_plus" @click="stagePlus()">Continuar</button>
+            <button class="btn_plus" @click="validator(2, formData, $event)">
+              Continuar
+            </button>
           </div>
         </div>
       </div>
 
-      <div v-if="stage === 3">
+      <div v-if="informations.status.value === 3">
         <p>Etapa <span>3</span> de 4</p>
         <h2>Senha de Acesso</h2>
         <label class="label" for="password"> Senha: </label>
@@ -185,13 +214,18 @@
           type="password"
           v-model="formData.password"
         />
+        <span v-if="informations.validArray.value.includes('password')"
+          >Preenchimento Obrigatório</span
+        >
         <div class="btn_box">
           <button class="btn_minus" @click="stageMinus()">Voltar</button>
-          <button class="btn_plus" @click="stagePlus()">Continuar</button>
+          <button class="btn_plus" @click="validator(3, formData, $event)">
+            Continuar
+          </button>
         </div>
       </div>
 
-      <div v-if="stage === 4">
+      <div v-if="informations.status.value === 4">
         <div>
           <p>Etapa <span>4</span> de 4</p>
           <h2>Revise as suas Informações</h2>
@@ -300,44 +334,3 @@
     </form>
   </div>
 </template>
-
-<style scoped>
-  .input_text {
-    width: 100%;
-  }
-  .container {
-    display: flex;
-    justify-content: center;
-  }
-
-  .btn_box {
-    display: flex;
-    padding-top: 10px;
-    justify-content: space-between;
-  }
-  .btn_plus {
-    width: 48%;
-    color: #fff;
-    background-color: #ff9900;
-    padding: 6px;
-    border: none;
-    border-radius: 4px;
-  }
-
-  .btn_minus {
-    width: 48%;
-    color: #ff9900;
-    background-color: #ffffff;
-    padding: 6px;
-    border: 1px solid #ff9900;
-    border-radius: 4px;
-  }
-
-  .label {
-    display: block;
-  }
-
-  span {
-    color: #ff9900;
-  }
-</style>
